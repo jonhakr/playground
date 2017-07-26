@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "TutorialConfig.h"
+#include "TutorialConfig.hpp"
 #ifdef USE_MYMATH
-#include "MathFunctions.h"
+#include "MathFunctions.hpp"
 #endif
 
 int main (int argc, char *argv[])

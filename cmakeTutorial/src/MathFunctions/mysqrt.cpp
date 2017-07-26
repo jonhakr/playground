@@ -1,4 +1,4 @@
-#include "MathFunctions.h"
+#include "MathFunctions.hpp"
 #include <stdio.h>
 
 double mysqrt(double x)

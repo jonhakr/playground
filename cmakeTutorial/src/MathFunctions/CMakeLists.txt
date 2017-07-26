@@ -1,4 +1,4 @@
-add_library(MathFunctions mysqrt.cxx)
+add_library(MathFunctions mysqrt.cpp)
 
 install (TARGETS MathFunctions DESTINATION bin)
-install (FILES MathFunctions.h DESTINATION inlude)
+install (FILES MathFunctions.hpp DESTINATION include)
