@@ -4,12 +4,17 @@ project (Tutorial)
 set (Tutorial_VERSION_MAJOR 1)
 set (Tutorial_VERSION_MINOR 0)
 
+# Does this system provide the log and exp functions?
+include (${CMAKE_ROOT}/Modules/CheckFunctionExists.cmake)
+check_function_exists (log HAVE_LOG)
+check_function_exists (exp HAVE_EXP)
+
 option (USE_MYMATH "Use tutorial provided math implementation" ON)
 
 configure_file (
 	"${PROJECT_SOURCE_DIR}/TutorialConfig.hpp.in"
-	"${PROJECT_BINARY_DIR}/TutorialConfig.hpp" 
-)
+	"${PROJECT_BINARY_DIR}/TutorialConfig.hpp"
+	)
 
 include_directories (
 	"${PROJECT_BINARY_DIR}"
