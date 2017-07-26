@@ -1,6 +1,7 @@
 #include "MathFunctions.hpp"
 #include "TutorialConfig.hpp"
 #include <stdio.h>
+#include "Table.hpp"
 
 double mysqrt(double x)
 {
@@ -15,18 +16,25 @@ double mysqrt(double x)
 	result = exp(log(x) * 0.5);
 	fprintf(stdout, "Computing sqrt of %g to be %g using log\n", x,result);
 #else
-	double delta;	
-	result = x;
+	if (x >= 1 && x < 10)
+		result = sqrtTable[static_cast<int>(x)];
+	else
+		result = x;
 
-	// Do ten iterations
+	double delta;	
 	int i;
-	for (i = 0; i < 10; ++i)
+	for (i = 0; i < SQRT_ITERATIONS; ++i)
 	{
 		if (result <= 0)
 			result = 0.1;
 		delta = x - (result * result);
-		result = result + 0.5 * delta / result;
-		fprintf(stdout, "Computing sqrt of %g to be %g\n", x, result);
+		if (delta < SQRT_THRESHOLD)
+			break;
+		else
+		{
+			result = result + 0.5 * delta / result;
+			fprintf(stdout, "Computing sqrt of %g to be %g\n", x, result);
+		}
 	}
 #endif
 	return result;
