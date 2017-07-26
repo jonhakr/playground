@@ -28,7 +28,7 @@ double mysqrt(double x)
 		if (result <= 0)
 			result = 0.1;
 		delta = x - (result * result);
-		if (delta < SQRT_THRESHOLD)
+		if (delta == 0)
 			break;
 		else
 		{
