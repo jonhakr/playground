@@ -4,8 +4,8 @@ A daemon that triggers a graceful shutdown upon detecting a falling flank on GPI
 
 ## Usage
 
-1. Copy the daemon `shutdown_d.py` to /usr/sbin/
+1. Copy the daemon to sudo bin: `sudo cp shutdown_d.py /usr/sbin/shutdown_d.py`
 2. Make the daemon exectutable: `sudo chmod +x /usr/sbin/shutdown_d.py`
-3. Copy `pi_shutdown.rc`to /etc/init.d/
-4. Add the service to rc.d: `sudo update-rc.d pi_shutdown defaults` 
+3. Copy the service initscript: `sudo cp pi_shutdown.rc /etc/init.d/pi_shutdown.rc`
+4. Add the service to rc.d: `sudo update-rc.d pi_shutdown.rc defaults` 
 5. Reboot
