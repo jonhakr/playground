@@ -7,6 +7,17 @@ import serial
 import re
 
 
+def printHelp():
+    print('######')
+    print('# matchMac.py')
+    print('# - Match MAC address from QR code and via Embedded Manager CLI')
+    print('> h \t - Show this help')
+    print('> s \t - Scan MAC address from QR Code')
+    print('> r \t - Read MAC address via EM CLI')
+    print('> q \t - Quit')
+    print('######')
+
+
 def compareMAC(mac1, mac2):
     if mac1 and mac2:
         if mac1 == mac2:
@@ -14,8 +25,6 @@ def compareMAC(mac1, mac2):
         else:
             print("NO-MATCH: %s =! %s" % (mac1, mac2))
 
-
-macFind = re.compile('([0-9a-f]{2}(?:-[0-9a-f]{2}){7})', re.IGNORECASE)
 
 em_cli = serial.Serial(
     port='/dev/ttyUSB2',
@@ -25,14 +34,23 @@ em_cli = serial.Serial(
     bytesize=serial.EIGHTBITS,
     timeout=0.5
     )
-em_cli.isOpen()
-print(em_cli.name)
+if not em_cli.isOpen(): # Should replace with try/catch
+    print("Failed to open EM CLI on %s" % em_cli.name)
+    quit()
+print("Opened EM CLI on %s" % em_cli.name)
 
 cv2.namedWindow('QR Camera')
 cap = cv2.VideoCapture(0) # first indexed webcam
+if not cap.isOpened():
+    print("Failed to open camera index 0")
+    quit()
+
+macFind = re.compile('([0-9a-f]{2}(?:-[0-9a-f]{2}){7})', re.IGNORECASE)
 scanCode = False
 code_scanned = ""
 code_read = ""
+
+printHelp()
 
 while True:
     # Capture frame-by-frame
@@ -42,14 +60,10 @@ while True:
     cv2.imshow('QR Camera', frame)
 
     if scanCode:
-        # Create grayscale
+        # Scan frame for QR code until one is decoded
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        # Build image and scan for QR code
         image = Image.fromarray(gray)
         qrcode = zbarlight.scan_codes('qrcode', image)
-
-        # Display resulting frame and print any QR code
         if qrcode:
             scanCode = False
             code_scanned = qrcode[0].decode('utf-8').replace(' ', ':')
@@ -60,6 +74,8 @@ while True:
     if keyPress == ord('q'):
         # Exit
         break
+    elif keyPress == ord('h'):
+        printHelp()
     elif keyPress == ord('s'):
         # Scan code
         scanCode = True
@@ -67,9 +83,9 @@ while True:
         # Read MAC address
         em_cli.write(b'login user\r\n')
         time.sleep(0.2)
-        em_cli.flushInput()
+        em_cli.flushInput() # Flush 2 empty lines received after login
         em_cli.write(b'show mote 2r\n')
-        time.sleep(1)
+        time.sleep(1) # Wait to receive whole message
         while em_cli.in_waiting > 0:
             readStr = em_cli.readline().decode('utf-8')
             if 'mac' in readStr:
@@ -77,6 +93,10 @@ while True:
                 code_read = macStr[0].replace('-', ':')
                 print("Read MAC address: %s" % code_read)
                 compareMAC(code_scanned, code_read)
+
+                # Flush the remaining lines in buffer
+                em_cli.flushInput()
+                break
 
 cap.release()
 cv2.destroyAllWindows()
